@@ -44,4 +44,13 @@
       android:text="Frame Layout Test"
       />
 
+    <Button
+        android:id="@+id/btnFrameLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Frame Layout Test"
+        android:onClick="logFunction"
+        />
+
+
 </LinearLayout>
