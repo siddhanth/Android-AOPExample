@@ -68,21 +68,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
       openActivity(RelativeLayoutTestActivity.class);
     }
-  };
 
-  private View.OnClickListener btnLinearLayoutOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      openActivity(LinearLayoutTestActivity.class);
-    }
-  };
+    private View.OnClickListener btnRelativeLayoutOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            openActivity(RelativeLayoutTestActivity.class);
+        }
+    };
 
-  private View.OnClickListener btnFrameLayoutOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      openActivity(FrameLayoutTestActivity.class);
-    }
-  };*/
+    private View.OnClickListener btnLinearLayoutOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            openActivity(LinearLayoutTestActivity.class);
+        }
+    };
+
+    private View.OnClickListener btnFrameLayoutOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            openActivity(FrameLayoutTestActivity.class);
+        }
+    };
 
     /**
      * Open and activity
@@ -161,5 +167,5 @@ public class MainActivity extends Activity implements View.OnClickListener {
             dialog.show();
         }
     }
-
+    
 }

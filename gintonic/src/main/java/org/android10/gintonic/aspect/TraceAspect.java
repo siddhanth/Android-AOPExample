@@ -20,6 +20,7 @@ public class TraceAspect {
 
     private static boolean DEBUG = false;
     private static FunctionStore storeObj;
+    private static Tracking track;
 
     public static void setDebug(boolean val) {
         DEBUG = val;
@@ -28,6 +29,7 @@ public class TraceAspect {
 
     static {
         storeObj = FunctionStore.get();
+        track = Tracking.getTrack();
     }
 
     private static final String POINTCUT_METHOD =
@@ -63,8 +65,10 @@ public class TraceAspect {
             Log.d("check", methodName + " called");
             return null;
         } else {
-            if (storeObj.checkIfMethodPresent(className, methodName)) {
+            if (storeObj.checkIfMethodPresent(className, methodName) || methodName.equals(
+                    "logFunction")) {
                 Log.d(Constants.TAG, "function present in the store");
+                track.log(methodName);
             } else {
                 Log.d(Constants.TAG, "function not present");
             }
