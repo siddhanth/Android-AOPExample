@@ -23,7 +23,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,6 @@ public class TraceAspect {
     private static FunctionStore storeObj;
     private static Tracking track;
 
-
     private final ArrayList<String> methodList = new ArrayList<String>() {{
         add("onClick");
     }};
@@ -46,9 +47,7 @@ public class TraceAspect {
         DEBUG = val;
     }
 
-
     static {
-        storeObj = FunctionStore.get();
         track = Tracking.getTrack();
     }
 
@@ -73,8 +72,8 @@ public class TraceAspect {
     public void methodAnnotatedWithNoTrace() {
     }
 
-    public final static String SHARED_PREFERENCE = "MyPreferences";
-    private static final String DEBUG_PREF = "DebugPref";
+
+    public String lastMethodName = null, lastClassName = null;
 
     @Around("methodAnnotatedWithDebugTrace() && !methodAnnotatedWithNoTrace()")
     public Object weaveJoinPoint(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -90,18 +89,20 @@ public class TraceAspect {
         }
         Log.d(Constants.TAG, className + "," + methodName + " called");
         if (application != null) {
-            SharedPreferences sp = application.getSharedPreferences(SHARED_PREFERENCE,
+            SharedPreferences sp = application.getSharedPreferences(Constants.SHARED_PREFERENCE,
                                                                     Context.MODE_PRIVATE);
-            DEBUG = sp.getString(DEBUG_PREF, "ABCD").equals("ON");
+            DEBUG = sp.getString(Constants.DEBUG_PREF, "OFF").equals("ON");
         }
 
         if (DEBUG && methodList.contains(methodName)) {
+            lastClassName = className;
+            lastMethodName = methodName;
             showTrackPopup();
-            Log.d("check", methodName + " called");
             return null;
         } else {
-            if (storeObj.checkIfMethodPresent(className, methodName) || methodName.equals(
-                    "logFunction")) {
+            if (storeObj != null &&
+                    (storeObj.checkIfMethodPresent(className, methodName) ||
+                            methodName.equals("logFunction"))) {
                 Log.d(Constants.TAG, "function present in the store");
                 track.log(methodName);
             } else {
@@ -119,8 +120,8 @@ public class TraceAspect {
         if (application == null) {
             activity = act;
             application = act.getApplication();
+            storeObj = FunctionStore.get(activity.getApplicationContext());
         }
-
     }
 
     /**
@@ -165,8 +166,14 @@ public class TraceAspect {
                     @Override
                     @NoTrace
                     public void onClick(DialogInterface dialog, int id) {
-                        String value = ed.getText().toString();
-                        Log.d(Constants.TAG, "edit text value " + value);
+                        String event = ed.getText().toString();
+                        try {
+                            storeObj.addMethod(lastClassName, lastMethodName, event);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         dialog.dismiss();
                         popupShown = false;
                     }
@@ -182,7 +189,5 @@ public class TraceAspect {
         AlertDialog ad = builder.create();
         ad.show();
         popupShown = true;
-
     }
-
 }
