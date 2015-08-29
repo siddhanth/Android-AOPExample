@@ -3,10 +3,8 @@ package org.android10.viewgroupperformance.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
@@ -26,7 +24,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TraceAspect.init(this.getApplication());
+        TraceAspect.init(this);
         setContentView(R.layout.activity_main);
         mContext = this;
         mapGUI();
@@ -53,8 +51,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         button7 = (Button) findViewById(R.id.button7);
         button8 = (Button) findViewById(R.id.button8);
 
-        buttonToggle.setOnClickListener(this);
-        button1.setOnClickListener(this);
+//        buttonToggle.setOnClickListener(this);
+//        button1.setOneClickListener(this);
         button2.setOnClickListener(this);
         button3.setOnClickListener(this);
         button4.setOnClickListener(this);
@@ -127,47 +125,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case R.id.button8:
                 buttonClick();
                 break;
-            case R.id.button_toggle:
-                if (buttonToggle.getText().toString().equals(ON)) {
-                    PrefUtils.setDebugPref(mContext, OFF);
-                    buttonToggle.setText(OFF);
-                    buttonToggle.setBackgroundColor(getResources().getColor(R.color.red));
-                } else if (buttonToggle.getText().toString().equals(OFF)) {
-                    PrefUtils.setDebugPref(mContext, ON);
-                    buttonToggle.setText(ON);
-                    buttonToggle.setBackgroundColor(getResources().getColor(R.color.green));
-                }
-                break;
         }
     }
 
     public void buttonClick() {
-        if (PrefUtils.getDebugPref(mContext).equals(OFF)) {
-            openActivity(LinearLayoutTestActivity.class);
-        }
-        if (PrefUtils.getDebugPref(mContext).equals(ON)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-
-            LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-            View promptView = layoutInflater.inflate(R.layout.dialog_edittext, null);
-            builder.setTitle("Set log")
-                    .setView(promptView)
-                    .setCancelable(true)
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-
-            dialog = builder.create();
-            dialog.show();
-        }
+        return;
     }
 
+    public void f123(View view) {
+
+    }
+
+    public void annotate(View view) {
+        if (buttonToggle.getText().toString().equals(ON)) {
+            PrefUtils.setDebugPref(mContext, OFF);
+            buttonToggle.setText(OFF);
+            buttonToggle.setBackgroundColor(getResources().getColor(R.color.red));
+        } else if (buttonToggle.getText().toString().equals(OFF)) {
+            PrefUtils.setDebugPref(mContext, ON);
+            buttonToggle.setText(ON);
+            buttonToggle.setBackgroundColor(getResources().getColor(R.color.green));
+        }
+    }
 }

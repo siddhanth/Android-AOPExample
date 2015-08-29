@@ -3,6 +3,8 @@ package org.android10.viewgroupperformance.activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.android10.gintonic.annotation.NoTrace;
+
 /**
  * Utilities and constants related to app preferences.
  */
@@ -11,11 +13,13 @@ public class PrefUtils  {
 	
 	private static final String DEBUG_PREF = "DebugPref";
 
+    @NoTrace
     public static String getDebugPref(final Context context) {
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE);
         return sp.getString(DEBUG_PREF, MainActivity.OFF);
     }
-
+    
+    @NoTrace
     public static void setDebugPref(final Context context, String value) {
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCE, Context.MODE_PRIVATE);
         sp.edit().putString(DEBUG_PREF, value).apply();

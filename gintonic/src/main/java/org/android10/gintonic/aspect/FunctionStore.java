@@ -32,7 +32,7 @@ public class FunctionStore {
     }
 
     @NoTrace
-    public void addMethod(String className, String functionName) throws JSONException {
+    public void addMethod(String className, String functionName, String ...params) throws JSONException {
         if (!store.has(className)) {
             store.put(className, new JSONArray());
         }

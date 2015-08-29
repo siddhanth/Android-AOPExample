@@ -20,7 +20,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:text="@string/button1" />
+                android:text="@string/button1"
+                android:onClick="f123"/>
 
             <Button
                 android:id="@+id/button2"
@@ -79,6 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_margin="8dp" />
+        android:layout_margin="8dp"
+        android:onClick="annotate"/>
 
 </RelativeLayout>
