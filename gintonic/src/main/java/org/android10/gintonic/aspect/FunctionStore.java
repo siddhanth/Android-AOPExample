@@ -1,6 +1,8 @@
 package org.android10.gintonic.aspect;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import org.android10.gintonic.annotation.NoTrace;
 import org.apache.http.HttpResponse;
@@ -27,7 +29,7 @@ public class FunctionStore {
 
     JSONObject store;
     private static FunctionStore fsObj;
-    Context context;
+    public static Context context;
 
     @NoTrace
     private void load() {
@@ -38,9 +40,10 @@ public class FunctionStore {
             String storeData = getStringFromInputStream(fin);
             store = new JSONObject(storeData);
             fin.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        store = new JSONObject();
     }
 
     @NoTrace
@@ -65,7 +68,6 @@ public class FunctionStore {
                 }
             }
         }
-
         return sb.toString();
     }
 
@@ -79,8 +81,9 @@ public class FunctionStore {
     public void save() throws IOException {
         FileOutputStream fOut = context.openFileOutput(
                 Constants.FunctionStore, Context.MODE_PRIVATE);
-        fOut.write(fsObj.toString().getBytes());
+        fOut.write(store.toString().getBytes());
         fOut.close();
+        Log.d(Constants.TAG, store.toString());
         uploadToServer();
     }
 
@@ -100,40 +103,45 @@ public class FunctionStore {
         }
 
         String eventName = "";
-        if (params!=null && params.length>0){
+        String viewId = "";
+        if (params != null && params.length > 0) {
             eventName = params[0];
+            viewId = params[1];
         }
-
-        JSONArray arr = (JSONArray) store.get(className);
-        boolean methodPresent = false;
-        for (int ix = 0; ix < arr.length(); ix++) {
-            if (arr.get(ix).equals(functionName)) {
-                methodPresent = true;
-            }
-        }
+        boolean methodPresent = checkIfMethodPresent(className, functionName, viewId);
         if (!methodPresent) {
             JSONObject obj = new JSONObject();
             obj.put(Constants.FUNCTION_NAME, functionName);
             obj.put(Constants.EVENT_NAME, eventName);
-            arr.put(obj);
+            obj.put(Constants.VIEW_ID, viewId);
+            ((JSONArray) store.get(className)).put(obj);
             save();
-
         }
     }
 
     @NoTrace
-    public boolean checkIfMethodPresent(String classname, String functionName) throws
-            JSONException {
+    public boolean checkIfMethodPresent(String classname, String functionName, String viewId) {
         if (store == null) {
             load();
         }
         boolean present = false;
-            if (store.has(classname)) {
-            JSONArray arr = (JSONArray) store.get(classname);
+        if (store.has(classname)) {
+            JSONArray arr = null;
+            try {
+                arr = (JSONArray) store.get(classname);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             for (int ix = 0; ix < arr.length(); ix++) {
-                JSONObject jObj = arr.getJSONObject(ix);
-                if (jObj.getString(Constants.FUNCTION_NAME).equals(functionName)){
-                    present =  true;
+                try {
+                    JSONObject jObj = arr.getJSONObject(ix);
+                    if (jObj.getString(Constants.FUNCTION_NAME).equals(functionName) && jObj
+                            .getString(
+                                    Constants.VIEW_ID).equals(viewId)) {
+                        present = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -142,21 +150,32 @@ public class FunctionStore {
 
     @NoTrace
     public void uploadToServer() throws FileNotFoundException {
-        String url = Constants.SERVER_PATH;
-        FileInputStream fin = context
-                .openFileInput(Constants.FunctionStore);
+        UploadToServer u = new UploadToServer();
+        u.execute();
+    }
+}
+
+
+class UploadToServer extends AsyncTask<String, String, String> {
+
+    @Override
+    protected String doInBackground(String... strings) {
         try {
+            FileInputStream fin = FunctionStore.context
+                    .openFileInput(Constants.FunctionStore);
+
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(url);
+            HttpPost httppost = new HttpPost(Constants.SERVER_PATH);
             InputStreamEntity reqEntity = new InputStreamEntity(
                     fin, -1);
-            reqEntity.setContentType("binary/octet-stream");
+//            reqEntity.setContentType("binary/octet-stream");
             reqEntity.setChunked(true); // Send in multiple parts if needed
             httppost.setEntity(reqEntity);
             HttpResponse response = httpclient.execute(httppost);
-
+            Log.d(Constants.TAG, response.toString());
         } catch (Exception e) {
-            // show error
+            Log.d(Constants.TAG, e.getMessage());
         }
+        return null;
     }
 }

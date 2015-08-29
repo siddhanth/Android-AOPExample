@@ -74,18 +74,20 @@ public class TraceAspect {
 
 
     public String lastMethodName = null, lastClassName = null;
+    int lastViewId = -1;
 
     @Around("methodAnnotatedWithDebugTrace() && !methodAnnotatedWithNoTrace()")
     public Object weaveJoinPoint(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String className = methodSignature.getDeclaringType().getSimpleName();
         String methodName = methodSignature.getName();
+        int viewId = -1;
         Object[] args = joinPoint.getArgs();
         for (int argIndex = 0; argIndex < args.length; argIndex++) {
             if (!(args[argIndex] instanceof View))
                 continue;
             View v = (View) args[argIndex];
-            Log.d(Constants.TAG, "view id " + v.getId());
+            viewId = v.getId();
         }
         Log.d(Constants.TAG, className + "," + methodName + " called");
         if (application != null) {
@@ -97,11 +99,12 @@ public class TraceAspect {
         if (DEBUG && methodList.contains(methodName)) {
             lastClassName = className;
             lastMethodName = methodName;
+            lastViewId = viewId;
             showTrackPopup();
             return null;
         } else {
             if (storeObj != null &&
-                    (storeObj.checkIfMethodPresent(className, methodName) ||
+                    (storeObj.checkIfMethodPresent(className, methodName, viewId + "") ||
                             methodName.equals("logFunction"))) {
                 Log.d(Constants.TAG, "function present in the store");
                 track.log(methodName);
@@ -168,7 +171,8 @@ public class TraceAspect {
                     public void onClick(DialogInterface dialog, int id) {
                         String event = ed.getText().toString();
                         try {
-                            storeObj.addMethod(lastClassName, lastMethodName, event);
+                            storeObj.addMethod(lastClassName, lastMethodName, event,
+                                               lastViewId + "");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
