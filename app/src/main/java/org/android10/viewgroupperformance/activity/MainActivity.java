@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
+import org.android10.gintonic.aspect.TraceAspect;
 import org.android10.viewgroupperformance.R;
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -25,6 +26,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TraceAspect.init(this.getApplication());
         setContentView(R.layout.activity_main);
         mContext = this;
         mapGUI();
@@ -63,36 +65,36 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     }
 
-  /*private View.OnClickListener btnRelativeLayoutOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      openActivity(RelativeLayoutTestActivity.class);
-    }
+    /*private View.OnClickListener btnRelativeLayoutOnClickListener = new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        openActivity(RelativeLayoutTestActivity.class);
+      }
 
-    private View.OnClickListener btnRelativeLayoutOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            openActivity(RelativeLayoutTestActivity.class);
-        }
-    };
+      private View.OnClickListener btnRelativeLayoutOnClickListener = new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              openActivity(RelativeLayoutTestActivity.class);
+          }
+      };
 
-    private View.OnClickListener btnLinearLayoutOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            openActivity(LinearLayoutTestActivity.class);
-        }
-    };
+      private View.OnClickListener btnLinearLayoutOnClickListener = new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              openActivity(LinearLayoutTestActivity.class);
+          }
+      };
 
-    private View.OnClickListener btnFrameLayoutOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            openActivity(FrameLayoutTestActivity.class);
-        }
-    };
+      private View.OnClickListener btnFrameLayoutOnClickListener = new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              openActivity(FrameLayoutTestActivity.class);
+          }
+      };
 
-    /**
-     * Open and activity
-     */
+      /**
+       * Open and activity
+       */
     private void openActivity(Class activityToOpen) {
         Intent intent = new Intent(this, activityToOpen);
         startActivity(intent);
@@ -167,5 +169,5 @@ public class MainActivity extends Activity implements View.OnClickListener {
             dialog.show();
         }
     }
-    
+
 }

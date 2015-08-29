@@ -4,6 +4,9 @@
  */
 package org.android10.gintonic.aspect;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -53,13 +56,21 @@ public class TraceAspect {
     public void methodAnnotatedWithNoTrace() {
     }
 
+    public final static String SHARED_PREFERENCE = "MyPreferences";
+    private static final String DEBUG_PREF = "DebugPref";
 
     @Around("methodAnnotatedWithDebugTrace() && !methodAnnotatedWithNoTrace()")
     public Object weaveJoinPoint(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String className = methodSignature.getDeclaringType().getSimpleName();
         String methodName = methodSignature.getName();
-        Log.d("check", className + "," + methodName + " called");
+
+        Log.d(Constants.TAG, className + "," + methodName + " called");
+        if (application != null) {
+            SharedPreferences sp = application.getSharedPreferences(SHARED_PREFERENCE,
+                                                                    Context.MODE_PRIVATE);
+            Log.d(Constants.TAG, "shared pref val = "+sp.getString(DEBUG_PREF, "ABCD"));
+        }
 
         if (DEBUG) {
             Log.d("check", methodName + " called");
@@ -74,6 +85,14 @@ public class TraceAspect {
             }
             Object result = joinPoint.proceed();
             return result;
+        }
+    }
+
+    private static Application application;
+
+    public static void init(Application a) {
+        if (application == null) {
+            application = a;
         }
     }
 
