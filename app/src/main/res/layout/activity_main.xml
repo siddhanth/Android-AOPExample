@@ -1,56 +1,84 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    >
+    tools:context=".MainActivity">
 
-  <TextView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="@string/url"
-      android:gravity="center"
-      />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-  <ImageView
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:src="@drawable/logo"
-      />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-  <Button
-      android:id="@+id/btnRelativeLayout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="Relative Layout Test"
-      />
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button1" />
 
-  <Button
-      android:id="@+id/btnLinearLayout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="Linear Layout Test"
-      />
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button2" />
 
-  <Button
-      android:id="@+id/btnFrameLayout"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="Frame Layout Test"
-      />
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button3" />
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button4" />
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button5" />
+
+            <Button
+                android:id="@+id/button6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button6" />
+
+            <Button
+                android:id="@+id/button7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button7" />
+
+            <Button
+                android:id="@+id/button8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/button8" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <Button
-        android:id="@+id/btnFrameLayout1"
-        android:layout_width="match_parent"
+        android:id="@+id/button_toggle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Frame Layout Test"
-        android:onClick="logFunction"
-        />
+        android:layout_alignParentRight="true"
+        android:layout_margin="8dp" />
 
-
-</LinearLayout>
+</RelativeLayout>
