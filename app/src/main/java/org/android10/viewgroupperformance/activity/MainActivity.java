@@ -28,7 +28,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         TraceAspect.init(this);
         TraceAspect.initLogHandlers(null, null);
 
-
         setContentView(R.layout.activity_main);
         mContext = this;
 

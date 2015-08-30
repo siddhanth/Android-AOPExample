@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.android10.gintonic.aspect.TraceAspect;
 import org.android10.viewgroupperformance.R;
 
 public class ProfileActivity extends ActionBarActivity implements View.OnClickListener {
@@ -19,6 +20,7 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TraceAspect.init(this);
         setContentView(R.layout.activity_profile);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
