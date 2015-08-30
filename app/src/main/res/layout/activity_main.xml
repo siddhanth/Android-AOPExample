@@ -14,48 +14,33 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <android.support.design.widget.TextInputLayout
+        <EditText
+            android:id="@+id/et_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:padding="5dp"
             android:layout_marginRight="30dp"
-            android:background="@color/white"
-            app:hintTextAppearance="@style/StyleTextInputLayout">
+            android:background="@drawable/edittext_selector"
+            android:cursorVisible="true"
+            android:hint="User name"
+            android:padding="5dp"
+            android:textColor="@color/primaryColor"
+            android:textCursorDrawable="@null" />
 
-            <EditText
-                android:id="@+id/et_username"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/edittext_selector"
-                android:cursorVisible="true"
-                android:hint="User name"
-                android:padding="5dp"
-                android:textColor="@color/primaryColor"
-                android:textCursorDrawable="@null" />
-        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <EditText
+            android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="30dp"
+            android:background="@drawable/edittext_selector"
+            android:cursorVisible="true"
+            android:hint="Password"
             android:padding="5dp"
-            android:background="@color/white"
-            app:hintTextAppearance="@style/StyleTextInputLayout">
-
-            <EditText
-                android:id="@+id/et_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/edittext_selector"
-                android:cursorVisible="true"
-                android:hint="Password"
-                android:padding="5dp"
-                android:textColor="@color/primaryColor"
-                android:textCursorDrawable="@null" />
-        </android.support.design.widget.TextInputLayout>
+            android:textColor="@color/primaryColor"
+            android:textCursorDrawable="@null" />
 
         <Button
             android:id="@+id/button_login"
@@ -66,7 +51,7 @@
             android:layout_marginTop="30dp"
             android:background="@color/white"
             android:elevation="5dp"
-            android:text="Login"/>
+            android:text="Login" />
 
     </LinearLayout>
 
