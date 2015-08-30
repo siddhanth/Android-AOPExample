@@ -44,10 +44,13 @@ public class Tracking {
     }
 
     @NoTrace
-    public void log(String eventName) {
+    public void log(String eventName, String screenName, String functionName) {
         JSONObject jObj = new JSONObject();
         try {
-            jObj.put(eventName, 1);
+            jObj.put(Constants.EVENT_NAME, eventName);
+            jObj.put(Constants.SCREEN_NAME, screenName);
+            jObj.put(Constants.FUNCTION_NAME, functionName);
+
             if (logAppender!=null){
                 logAppender.instrumentLog(jObj);
             }
@@ -80,8 +83,19 @@ class DefaultPusher implements LogPusher {
         @Override
         protected String doInBackground(JSONObject... jsonObjects) {
             JSONObject obj = jsonObjects[0];
-            String urlParameters = Constants.UPLOAD_LOG_PATH + obj.toString();
-            System.out.println(urlParameters);
+            JSONObject payLoad = new JSONObject();
+            try {
+                payLoad.put(obj.getString(Constants.EVENT_NAME), 1);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String urlParameters = null;
+            try {
+                urlParameters = Constants.UPLOAD_LOG_PATH + payLoad.toString()+"&screenname="+obj.getString(Constants.SCREEN_NAME)+"&action="+obj.getString(Constants.FUNCTION_NAME);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.d(Constants.TAG, urlParameters);
             URL url = null;
             try {
                 url = new URL(urlParameters);

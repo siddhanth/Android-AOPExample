@@ -8,6 +8,8 @@ public class Constants {
     public final static String FunctionStore = "FunctionStore";
     public final static String FUNCTION_NAME = "method";
     public final static String EVENT_NAME = "event";
+    public final static String SCREEN_NAME = "screen";
+
     public final static String VIEW_ID = "view_id";
     public final static String COUNT = "count";
 
