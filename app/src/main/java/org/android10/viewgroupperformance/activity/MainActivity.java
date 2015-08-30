@@ -40,7 +40,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             @Override
             public void handleLog(JSONObject obj) {
                 SyncToServer s = new SyncToServer();
-                s.execute();
+                s.execute(obj);
             }
 
             class SyncToServer extends AsyncTask<JSONObject, String, String> {
