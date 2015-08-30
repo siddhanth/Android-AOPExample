@@ -1,24 +1,28 @@
 package org.android10.gintonic.aspect;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import org.android10.gintonic.annotation.NoTrace;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * Created by siddhanthjain on 29/08/15.
@@ -27,7 +31,7 @@ public class FunctionStore {
 
     JSONObject store;
     private static FunctionStore fsObj;
-    Context context;
+    public static Context context;
 
     @NoTrace
     private void load() {
@@ -38,9 +42,10 @@ public class FunctionStore {
             String storeData = getStringFromInputStream(fin);
             store = new JSONObject(storeData);
             fin.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
+        store = new JSONObject();
     }
 
     @NoTrace
@@ -65,7 +70,6 @@ public class FunctionStore {
                 }
             }
         }
-
         return sb.toString();
     }
 
@@ -79,8 +83,9 @@ public class FunctionStore {
     public void save() throws IOException {
         FileOutputStream fOut = context.openFileOutput(
                 Constants.FunctionStore, Context.MODE_PRIVATE);
-        fOut.write(fsObj.toString().getBytes());
+        fOut.write(store.toString().getBytes());
         fOut.close();
+        Log.d(Constants.TAG, store.toString());
         uploadToServer();
     }
 
@@ -100,40 +105,45 @@ public class FunctionStore {
         }
 
         String eventName = "";
-        if (params!=null && params.length>0){
+        String viewId = "";
+        if (params != null && params.length > 0) {
             eventName = params[0];
+            viewId = params[1];
         }
-
-        JSONArray arr = (JSONArray) store.get(className);
-        boolean methodPresent = false;
-        for (int ix = 0; ix < arr.length(); ix++) {
-            if (arr.get(ix).equals(functionName)) {
-                methodPresent = true;
-            }
-        }
+        boolean methodPresent = checkIfMethodPresent(className, functionName, viewId);
         if (!methodPresent) {
             JSONObject obj = new JSONObject();
             obj.put(Constants.FUNCTION_NAME, functionName);
             obj.put(Constants.EVENT_NAME, eventName);
-            arr.put(obj);
+            obj.put(Constants.VIEW_ID, viewId);
+            ((JSONArray) store.get(className)).put(obj);
             save();
-
         }
     }
 
     @NoTrace
-    public boolean checkIfMethodPresent(String classname, String functionName) throws
-            JSONException {
+    public boolean checkIfMethodPresent(String classname, String functionName, String viewId) {
         if (store == null) {
             load();
         }
         boolean present = false;
-            if (store.has(classname)) {
-            JSONArray arr = (JSONArray) store.get(classname);
+        if (store.has(classname)) {
+            JSONArray arr = null;
+            try {
+                arr = (JSONArray) store.get(classname);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             for (int ix = 0; ix < arr.length(); ix++) {
-                JSONObject jObj = arr.getJSONObject(ix);
-                if (jObj.getString(Constants.FUNCTION_NAME).equals(functionName)){
-                    present =  true;
+                try {
+                    JSONObject jObj = arr.getJSONObject(ix);
+                    if (jObj.getString(Constants.FUNCTION_NAME).equals(functionName) && jObj
+                            .getString(
+                                    Constants.VIEW_ID).equals(viewId)) {
+                        present = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -142,21 +152,114 @@ public class FunctionStore {
 
     @NoTrace
     public void uploadToServer() throws FileNotFoundException {
-        String url = Constants.SERVER_PATH;
-        FileInputStream fin = context
-                .openFileInput(Constants.FunctionStore);
+        UploadToServer u = new UploadToServer();
+        u.execute();
+    }
+}
+
+
+class UploadToServer extends AsyncTask<String, String, String> {
+
+    @Override
+    protected String doInBackground(String... strings) {
+
+        int serverResponseCode;
         try {
+            HttpURLConnection conn = null;
+            DataOutputStream dos = null;
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String boundary = "*****";
+            int bytesRead, bytesAvailable, bufferSize;
+            byte[] buffer;
+            int maxBufferSize = 1 * 1024 * 1024;
+            File sourceFile = new File(Constants.FunctionStore);
+
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(url);
-            InputStreamEntity reqEntity = new InputStreamEntity(
-                    fin, -1);
-            reqEntity.setContentType("binary/octet-stream");
-            reqEntity.setChunked(true); // Send in multiple parts if needed
-            httppost.setEntity(reqEntity);
-            HttpResponse response = httpclient.execute(httppost);
+            HttpPost httppost = new HttpPost(Constants.SERVER_PATH);
+
+            // open a URL connection to the Servlet
+            FileInputStream fileInputStream = FunctionStore.context
+                    .openFileInput(Constants.FunctionStore);
+            URL url = new URL(Constants.SERVER_PATH);
+
+            // Open a HTTP  connection to  the URL
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoInput(true); // Allow Inputs
+            conn.setDoOutput(true); // Allow Outputs
+            conn.setUseCaches(false); // Don't use a Cached Copy
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+            conn.setRequestProperty("uploaded_file", Constants.FunctionStore);
+
+            dos = new DataOutputStream(conn.getOutputStream());
+
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(lineEnd);
+
+            // create a buffer of  maximum size
+            bytesAvailable = fileInputStream.available();
+
+            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            buffer = new byte[bufferSize];
+
+            // read file and write it into form...
+            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+            while (bytesRead > 0) {
+
+                dos.write(buffer, 0, bufferSize);
+                bytesAvailable = fileInputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+            }
+
+            // send multipart form data necesssary after file data...
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+            // Responses from the server (code and message)
+            serverResponseCode = conn.getResponseCode();
+            String serverResponseMessage = conn.getResponseMessage();
+
+            Log.i("uploadFile", "HTTP Response is : "
+                    + serverResponseMessage + ": " + serverResponseCode);
+
+            if (serverResponseCode == 200) {
+
+            }
+
+            //close the streams //
+            fileInputStream.close();
+            dos.flush();
+            dos.close();
 
         } catch (Exception e) {
-            // show error
+            e.printStackTrace();
         }
+
+
+//        try {
+//            FileInputStream fin = FunctionStore.context
+//                    .openFileInput(Constants.FunctionStore);
+//
+//            HttpClient httpclient = new DefaultHttpClient();
+//            HttpPost httppost = new HttpPost(Constants.SERVER_PATH);
+//            InputStreamEntity reqEntity = new InputStreamEntity(
+//                    fin, -1);
+////            reqEntity.setContentType("binary/octet-stream");
+//            reqEntity.setChunked(true); // Send in multiple parts if needed
+//            httppost.setEntity(reqEntity);
+//            HttpResponse response = httpclient.execute(httppost);
+//            Log.d(Constants.TAG, response.toString());
+//
+//        } catch (Exception e) {
+//            Log.d(Constants.TAG, e.getMessage());
+//        }
+        return null;
     }
 }
