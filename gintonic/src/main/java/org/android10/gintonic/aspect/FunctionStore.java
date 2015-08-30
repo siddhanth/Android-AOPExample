@@ -5,16 +5,15 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.android10.gintonic.annotation.NoTrace;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -22,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 
 /**
@@ -32,6 +33,12 @@ public class FunctionStore {
     JSONObject store;
     private static FunctionStore fsObj;
     public static Context context;
+
+
+    @NoTrace
+    public void updateStore(JSONObject obj) {
+        store = obj;
+    }
 
     @NoTrace
     private void load() {
@@ -44,6 +51,8 @@ public class FunctionStore {
             fin.close();
         } catch (Exception e) {
             e.printStackTrace();
+            DownloadFromServer d1 = new DownloadFromServer();
+            d1.execute();
         }
         store = new JSONObject();
     }
@@ -110,8 +119,8 @@ public class FunctionStore {
             eventName = params[0];
             viewId = params[1];
         }
-        boolean methodPresent = checkIfMethodPresent(className, functionName, viewId);
-        if (!methodPresent) {
+        String methodPresent = checkIfMethodPresent(className, functionName, viewId);
+        if (methodPresent != null) {
             JSONObject obj = new JSONObject();
             obj.put(Constants.FUNCTION_NAME, functionName);
             obj.put(Constants.EVENT_NAME, eventName);
@@ -122,10 +131,11 @@ public class FunctionStore {
     }
 
     @NoTrace
-    public boolean checkIfMethodPresent(String classname, String functionName, String viewId) {
+    public String checkIfMethodPresent(String classname, String functionName, String viewId) {
         if (store == null) {
             load();
         }
+        String eventName = null;
         boolean present = false;
         if (store.has(classname)) {
             JSONArray arr = null;
@@ -141,125 +151,93 @@ public class FunctionStore {
                             .getString(
                                     Constants.VIEW_ID).equals(viewId)) {
                         present = true;
+                        eventName = jObj.getString(Constants.EVENT_NAME);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-        return present;
+        return eventName;
     }
+
 
     @NoTrace
     public void uploadToServer() throws FileNotFoundException {
         UploadToServer u = new UploadToServer();
-        u.execute();
+        u.execute(store.toString());
     }
 }
 
-
-class UploadToServer extends AsyncTask<String, String, String> {
+class DownloadFromServer extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... strings) {
 
-        int serverResponseCode;
+        String urlParameters = Constants.FETCH_CONFIG_PATH;
+        URL url = null;
         try {
-            HttpURLConnection conn = null;
-            DataOutputStream dos = null;
-            String lineEnd = "\r\n";
-            String twoHyphens = "--";
-            String boundary = "*****";
-            int bytesRead, bytesAvailable, bufferSize;
-            byte[] buffer;
-            int maxBufferSize = 1 * 1024 * 1024;
-            File sourceFile = new File(Constants.FunctionStore);
+            Log.d(Constants.TAG, "config downloaded started");
 
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(Constants.SERVER_PATH);
 
-            // open a URL connection to the Servlet
-            FileInputStream fileInputStream = FunctionStore.context
-                    .openFileInput(Constants.FunctionStore);
-            URL url = new URL(Constants.SERVER_PATH);
+            HttpClient client = new DefaultHttpClient();
+            HttpGet request = new HttpGet(urlParameters);
+            HttpResponse response = client.execute(request);
 
-            // Open a HTTP  connection to  the URL
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoInput(true); // Allow Inputs
-            conn.setDoOutput(true); // Allow Outputs
-            conn.setUseCaches(false); // Don't use a Cached Copy
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Connection", "Keep-Alive");
-            conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-            conn.setRequestProperty("uploaded_file", Constants.FunctionStore);
+            Log.d(Constants.TAG, "Url = " + url);
+            Log.d(Constants.TAG, "Response Code = " + response.getStatusLine().getStatusCode());
 
-            dos = new DataOutputStream(conn.getOutputStream());
+            BufferedReader rd = new BufferedReader(
+                    new InputStreamReader(response.getEntity().getContent()));
 
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(lineEnd);
-
-            // create a buffer of  maximum size
-            bytesAvailable = fileInputStream.available();
-
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            buffer = new byte[bufferSize];
-
-            // read file and write it into form...
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-            while (bytesRead > 0) {
-
-                dos.write(buffer, 0, bufferSize);
-                bytesAvailable = fileInputStream.available();
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
+            StringBuffer result = new StringBuffer();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
             }
 
-            // send multipart form data necesssary after file data...
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+            Log.d(Constants.TAG, "config downloaded " + result + "");
+            FunctionStore f1 = FunctionStore.get(FunctionStore.context);
+            JSONObject obj = new JSONObject(result.toString());
+            f1.updateStore(obj);
+            f1.save();
 
-            // Responses from the server (code and message)
-            serverResponseCode = conn.getResponseCode();
-            String serverResponseMessage = conn.getResponseMessage();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
 
-            Log.i("uploadFile", "HTTP Response is : "
-                    + serverResponseMessage + ": " + serverResponseCode);
+class UploadToServer extends AsyncTask<String, String, String> {
 
-            if (serverResponseCode == 200) {
+    @Override
+    protected String doInBackground(String... params) {
 
-            }
+        String urlParameters = Constants.UPLOAD_CONFIG_PATH + params[0];
+        System.out.println(urlParameters);
+        URL url = null;
+        try {
+            url = new URL(urlParameters);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            int responseCode = con.getResponseCode();
 
-            //close the streams //
-            fileInputStream.close();
-            dos.flush();
-            dos.close();
-
-        } catch (Exception e) {
+            Log.d(Constants.TAG, "config uploaded " + responseCode + "");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-//        try {
-//            FileInputStream fin = FunctionStore.context
-//                    .openFileInput(Constants.FunctionStore);
-//
-//            HttpClient httpclient = new DefaultHttpClient();
-//            HttpPost httppost = new HttpPost(Constants.SERVER_PATH);
-//            InputStreamEntity reqEntity = new InputStreamEntity(
-//                    fin, -1);
-////            reqEntity.setContentType("binary/octet-stream");
-//            reqEntity.setChunked(true); // Send in multiple parts if needed
-//            httppost.setEntity(reqEntity);
-//            HttpResponse response = httpclient.execute(httppost);
-//            Log.d(Constants.TAG, response.toString());
-//
-//        } catch (Exception e) {
-//            Log.d(Constants.TAG, e.getMessage());
-//        }
         return null;
     }
 }

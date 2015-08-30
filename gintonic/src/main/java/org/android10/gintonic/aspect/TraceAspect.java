@@ -11,6 +11,7 @@ import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class TraceAspect {
     private static boolean DEBUG = false;
     private static FunctionStore storeObj;
     private static Tracking track;
+    SharedPreferences sp;
 
     private final ArrayList<String> methodList = new ArrayList<String>() {{
         add("onClick");
@@ -88,6 +90,11 @@ public class TraceAspect {
         String methodName = methodSignature.getName();
         int viewId = -1;
         Object[] args = joinPoint.getArgs();
+        if (sp == null){
+            sp = activity.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
+        }
+
+        DEBUG = sp.getString(Constants.DEBUG_PREF, Constants.OFF).equals(Constants.ON);
         for (int argIndex = 0; argIndex < args.length; argIndex++) {
             if (!(args[argIndex] instanceof View))
                 continue;
@@ -101,17 +108,16 @@ public class TraceAspect {
             return result;
         }
 
-
         long currTime = System.currentTimeMillis();
         boolean processNormal = false;
-        if (!DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
+        if (DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
             processNormal = true;
             if (delayedHandler!=null) {
                 delayedHandler.removeCallbacksAndMessages(null);
             }
         }
 
-//        track.log(methodName);
+
 
         Log.d(Constants.TAG, "processNormal = "+processNormal);
         if (!processNormal ) {
@@ -127,11 +133,16 @@ public class TraceAspect {
             }, Constants.WAIT_TIME);
             result = null;
         } else {
-            if (storeObj != null &&
-                    (storeObj.checkIfMethodPresent(className, methodName, viewId + "") ||
-                            methodName.equals("logFunction"))) {
-                Log.d(Constants.TAG, "function present in the store");
-                track.log(methodName);
+            if (storeObj != null
+
+                            ) {
+                String eventName = storeObj.checkIfMethodPresent(className, methodName, viewId + "");
+                if (eventName!=null){
+                    Log.d(Constants.TAG, "function present in the store");
+                    track.log(eventName);
+                }else{
+                    Log.d(Constants.TAG, "function not present");
+                }
             } else {
                 Log.d(Constants.TAG, "function not present");
             }

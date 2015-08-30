@@ -33,9 +33,10 @@ public class Tracking {
     }
 
     @NoTrace
-    public void log(String functionName) {
+    public void log(String eventName) {
+
         SyncToServer obj = new SyncToServer();
-        obj.execute(functionName);
+        obj.execute(eventName);
     }
 }
 
@@ -51,8 +52,7 @@ class SyncToServer extends AsyncTask<String, String, String> {
         String funcName = params[0];
         JSONObject obj = new JSONObject();
         try {
-            obj.put(Constants.FUNCTION_NAME, funcName);
-            obj.put(Constants.COUNT, 1);
+            obj.put(funcName, 1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
