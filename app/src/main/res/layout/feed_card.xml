@@ -112,6 +112,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:id="@+id/feed_like_img"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
@@ -120,6 +121,7 @@
                         android:src="@drawable/ic_action_thumb_up" />
 
                     <TextView
+                        android:id="@+id/feed_like_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -146,6 +148,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:id="@+id/feed_comment_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
@@ -154,6 +157,7 @@
                         android:src="@drawable/ic_communication_messenger" />
 
                     <TextView
+                        android:id="@+id/feed_comment_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -180,6 +184,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:id="@+id/feed_share_image"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="10dp"
@@ -188,6 +193,7 @@
                         android:src="@drawable/ic_social_share" />
 
                     <TextView
+                        android:id="@+id/feed_share_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"

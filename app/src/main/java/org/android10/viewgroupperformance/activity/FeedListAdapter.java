@@ -19,10 +19,12 @@ public class FeedListAdapter extends BaseAdapter implements View.OnClickListener
     List<FeedModel> data;
     Context context;
     private LayoutInflater inf;
+    boolean likeSelected, commentSelected, shareSelected;
 
     public FeedListAdapter(List<FeedModel> data, Context context) {
         this.data = data;
         this.context = context;
+        likeSelected = commentSelected = shareSelected = false;
         this.inf = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -91,10 +93,36 @@ public class FeedListAdapter extends BaseAdapter implements View.OnClickListener
             case R.id.feed_card:
                 break;
             case R.id.feed_like:
-                break;
+                TextView likeText = (TextView) v.findViewById(R.id.feed_like_text);
+                ImageView likeImage = (ImageView) v.findViewById(R.id.feed_like_img);
+                if(likeSelected){
+                    likeImage.setImageResource(R.drawable.ic_action_thumb_up);
+                    likeText.setTextColor(context.getResources().getColor(R.color.medium_grey));
+                } else{
+                    likeImage.setImageResource(R.drawable.ic_action_thumb_up_blue);
+                    likeText.setTextColor(context.getResources().getColor(R.color.primaryLight));
+                }
             case R.id.feed_comment:
+                TextView commentText = (TextView) v.findViewById(R.id.feed_comment_text);
+                ImageView commentImage = (ImageView) v.findViewById(R.id.feed_comment_image);
+                if(likeSelected){
+                    commentImage.setImageResource(R.drawable.ic_communication_messenger);
+                    commentText.setTextColor(context.getResources().getColor(R.color.medium_grey));
+                } else{
+                    commentImage.setImageResource(R.drawable.ic_communication_messenger_blue);
+                    commentText.setTextColor(context.getResources().getColor(R.color.primaryLight));
+                }
                 break;
             case R.id.feed_share:
+                TextView shareText = (TextView) v.findViewById(R.id.feed_share_text);
+                ImageView shareImage = (ImageView) v.findViewById(R.id.feed_share_image);
+                if(likeSelected){
+                    shareImage.setImageResource(R.drawable.ic_social_share);
+                    shareText.setTextColor(context.getResources().getColor(R.color.medium_grey));
+                } else{
+                    shareImage.setImageResource(R.drawable.ic_social_share_blue);
+                    shareText.setTextColor(context.getResources().getColor(R.color.primaryLight));
+                }
                 break;
         }
     }
