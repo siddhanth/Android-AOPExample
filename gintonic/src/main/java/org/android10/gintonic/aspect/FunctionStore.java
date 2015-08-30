@@ -52,9 +52,9 @@ public class FunctionStore {
             fin.close();
         } catch (Exception e) {
             e.printStackTrace();
-            DownloadFromServer d1 = new DownloadFromServer();
-            d1.execute();
         }
+        DownloadFromServer d1 = new DownloadFromServer();
+        d1.execute();
     }
 
     @NoTrace

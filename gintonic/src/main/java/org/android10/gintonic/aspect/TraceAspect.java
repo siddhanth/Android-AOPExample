@@ -116,7 +116,7 @@ public class TraceAspect {
             }
         }
 
-        track.log("test");
+        track.log("test", className, methodName);
         Log.d(Constants.TAG, "processNormal = " + processNormal);
         if (!processNormal) {
             lastClassName = className;
@@ -132,20 +132,18 @@ public class TraceAspect {
             result = null;
         } else {
             if (storeObj != null
-
                     ) {
                 String eventName = storeObj.checkIfMethodPresent(className, methodName,
                                                                  viewId + "");
                 if (eventName != null) {
                     Log.d(Constants.TAG, "function present in the store");
-                    track.log(eventName);
+                    track.log(eventName, className, methodName);
                 } else {
                     Log.d(Constants.TAG, "function not present");
                 }
             } else {
                 Log.d(Constants.TAG, "function not present");
             }
-
             result = joinPoint.proceed();
         }
 
