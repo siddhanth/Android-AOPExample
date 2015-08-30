@@ -54,7 +54,6 @@ public class FunctionStore {
             DownloadFromServer d1 = new DownloadFromServer();
             d1.execute();
         }
-        store = new JSONObject();
     }
 
     @NoTrace

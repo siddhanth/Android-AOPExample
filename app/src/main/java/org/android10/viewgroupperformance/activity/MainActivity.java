@@ -3,24 +3,14 @@ package org.android10.viewgroupperformance.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import org.android10.gintonic.aspect.Constants;
-import org.android10.gintonic.aspect.LogPusher;
 import org.android10.gintonic.aspect.TraceAspect;
 import org.android10.viewgroupperformance.R;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -36,48 +26,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TraceAspect.init(this);
-        TraceAspect.initLogHandlers(null, new LogPusher() {
-            @Override
-            public void handleLog(JSONObject obj) {
-                SyncToServer s = new SyncToServer();
-                s.execute(obj);
-            }
-
-            class SyncToServer extends AsyncTask<JSONObject, String, String> {
-
-                @Override
-                protected void onPostExecute(String s) {
-                    super.onPostExecute(s);
-                }
-
-                @Override
-                protected String doInBackground(JSONObject... jsonObjects) {
-                    JSONObject obj = jsonObjects[0];
-                    String urlParameters = Constants.UPLOAD_LOG_PATH + obj.toString();
-                    System.out.println(urlParameters);
-                    URL url = null;
-                    try {
-                        url = new URL(urlParameters);
-                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                        con.setRequestMethod("GET");
-                        int responseCode = con.getResponseCode();
-                        Log.d(Constants.TAG, responseCode + "");
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } catch (ProtocolException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                }
-            }
-        });
+        TraceAspect.initLogHandlers(null, null);
 
 
         setContentView(R.layout.activity_main);
