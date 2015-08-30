@@ -101,7 +101,7 @@ public class TraceAspect {
             lastMethodName = methodName;
             lastViewId = viewId;
             showTrackPopup();
-            return null;
+
         } else {
             if (storeObj != null &&
                     (storeObj.checkIfMethodPresent(className, methodName, viewId + "") ||
@@ -111,9 +111,9 @@ public class TraceAspect {
             } else {
                 Log.d(Constants.TAG, "function not present");
             }
-            Object result = joinPoint.proceed();
-            return result;
         }
+        Object result = joinPoint.proceed();
+        return result;
     }
 
     private static Application application;
