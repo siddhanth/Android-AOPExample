@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import org.android10.gintonic.aspect.TraceAspect;
@@ -33,6 +34,9 @@ public class FeedActivity extends ActionBarActivity {
             toolbar.setTitle("News Feed");
             toolbar.setTitleTextColor(getResources().getColor(R.color.white));
             setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         }
 
         ListView feedList = (ListView) findViewById(R.id.feed_list);
@@ -40,6 +44,16 @@ public class FeedActivity extends ActionBarActivity {
         FeedListAdapter adapter = new FeedListAdapter(data, mContext);
         feedList.setAdapter(adapter);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void getData(){

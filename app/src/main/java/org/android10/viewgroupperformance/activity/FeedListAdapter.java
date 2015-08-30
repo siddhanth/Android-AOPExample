@@ -5,14 +5,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.android10.viewgroupperformance.R;
 
 import java.util.List;
 
-public class FeedListAdapter extends BaseAdapter {
+public class FeedListAdapter extends BaseAdapter implements View.OnClickListener{
 
     List<FeedModel> data;
     Context context;
@@ -46,6 +48,9 @@ public class FeedListAdapter extends BaseAdapter {
             convertView = inf.inflate(R.layout.feed_card, null);
         }
 
+        FrameLayout feedCard = (FrameLayout) convertView.findViewById(R.id.feed_card);
+        feedCard.setOnClickListener(this);
+
         TextView name = (TextView) convertView.findViewById(R.id.feed_name);
         name.setText(data.get(position).getName());
 
@@ -68,6 +73,29 @@ public class FeedListAdapter extends BaseAdapter {
             feedDataImage.setVisibility(View.GONE);
         }
 
+        LinearLayout like = (LinearLayout) convertView.findViewById(R.id.feed_like);
+        like.setOnClickListener(this);
+
+        LinearLayout comment = (LinearLayout) convertView.findViewById(R.id.feed_comment);
+        comment.setOnClickListener(this);
+
+        LinearLayout share = (LinearLayout) convertView.findViewById(R.id.feed_share);
+        share.setOnClickListener(this);
+
         return convertView;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.feed_card:
+                break;
+            case R.id.feed_like:
+                break;
+            case R.id.feed_comment:
+                break;
+            case R.id.feed_share:
+                break;
+        }
     }
 }
