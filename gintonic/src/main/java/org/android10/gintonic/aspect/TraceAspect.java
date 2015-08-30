@@ -39,7 +39,7 @@ public class TraceAspect {
     private static boolean DEBUG = false;
     private static FunctionStore storeObj;
     private static Tracking track;
-    SharedPreferences sp;
+    static SharedPreferences sp;
 
     private final ArrayList<String> methodList = new ArrayList<String>() {{
         add("onClick");
@@ -90,11 +90,10 @@ public class TraceAspect {
         String methodName = methodSignature.getName();
         int viewId = -1;
         Object[] args = joinPoint.getArgs();
-        if (sp == null){
-            sp = activity.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
-        }
 
-        DEBUG = sp.getString(Constants.DEBUG_PREF, Constants.OFF).equals(Constants.ON);
+        if (sp!=null) {
+            DEBUG = sp.getString(Constants.DEBUG_PREF, Constants.OFF).equals(Constants.ON);
+        }
         for (int argIndex = 0; argIndex < args.length; argIndex++) {
             if (!(args[argIndex] instanceof View))
                 continue;
@@ -163,6 +162,9 @@ public class TraceAspect {
             activity = act;
             application = act.getApplication();
             storeObj = FunctionStore.get(activity.getApplicationContext());
+        }
+        if (sp == null ){
+            sp = activity.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
         }
         activity = act;
     }
