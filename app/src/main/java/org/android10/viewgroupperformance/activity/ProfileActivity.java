@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -76,6 +77,12 @@ public class ProfileActivity extends ActionBarActivity implements View.OnClickLi
         LinearLayout share = (LinearLayout) findViewById(R.id.feed_share);
         share.setOnClickListener(this);
 
+        Button friends = (Button) findViewById(R.id.friends);
+        Button photots = (Button) findViewById(R.id.photos);
+        Button messages = (Button) findViewById(R.id.messages);
+        friends.setOnClickListener(this);
+        photots.setOnClickListener(this);
+        messages.setOnClickListener(this);
     }
 
     @Override

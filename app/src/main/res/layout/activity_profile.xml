@@ -65,6 +65,7 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/friends"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
@@ -77,6 +78,7 @@
                     android:text="Friends" />
 
                 <Button
+                    android:id="@+id/photos"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
@@ -89,6 +91,7 @@
                     android:text="Photos" />
 
                 <Button
+                    android:id="@+id/messages"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="4dp"
