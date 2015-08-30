@@ -120,7 +120,7 @@ public class FunctionStore {
             viewId = params[1];
         }
         String methodPresent = checkIfMethodPresent(className, functionName, viewId);
-        if (methodPresent != null) {
+        if (methodPresent == null) {
             JSONObject obj = new JSONObject();
             obj.put(Constants.FUNCTION_NAME, functionName);
             obj.put(Constants.EVENT_NAME, eventName);

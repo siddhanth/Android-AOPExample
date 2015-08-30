@@ -19,7 +19,7 @@ public class Constants {
     public final static String OFF = "OFF";
     public final static String ON = "ON";
 
-    public final static String SERVER_PATH = "http://128.199.218.214:32776";
+    public final static String SERVER_PATH = "http://128.199.218.214:32777";
     public final static String UPLOAD_CONFIG_PATH = SERVER_PATH+"/configput?config=";
     public final static String FETCH_CONFIG_PATH = SERVER_PATH+"/configget";
 
