@@ -5,6 +5,10 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.android10.gintonic.annotation.NoTrace;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -171,23 +175,30 @@ class DownloadFromServer extends AsyncTask<String, String, String> {
     protected String doInBackground(String... strings) {
 
         String urlParameters = Constants.FETCH_CONFIG_PATH;
-        System.out.println(urlParameters);
         URL url = null;
         try {
-            url = new URL(urlParameters);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            int responseCode = con.getResponseCode();
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            String finalString = "";
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                finalString += inputLine;
+            Log.d(Constants.TAG, "config downloaded started");
+
+
+            HttpClient client = new DefaultHttpClient();
+            HttpGet request = new HttpGet(urlParameters);
+            HttpResponse response = client.execute(request);
+
+            Log.d(Constants.TAG, "Url = " + url);
+            Log.d(Constants.TAG, "Response Code = " + response.getStatusLine().getStatusCode());
+
+            BufferedReader rd = new BufferedReader(
+                    new InputStreamReader(response.getEntity().getContent()));
+
+            StringBuffer result = new StringBuffer();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
             }
+
+            Log.d(Constants.TAG, "config downloaded " + result + "");
             FunctionStore f1 = FunctionStore.get(FunctionStore.context);
-            JSONObject obj = new JSONObject(finalString);
+            JSONObject obj = new JSONObject(result.toString());
             f1.updateStore(obj);
             f1.save();
 
@@ -217,7 +228,8 @@ class UploadToServer extends AsyncTask<String, String, String> {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             int responseCode = con.getResponseCode();
-            Log.d(Constants.TAG, responseCode + "");
+
+            Log.d(Constants.TAG, "config uploaded " + responseCode + "");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
