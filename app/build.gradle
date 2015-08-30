@@ -27,12 +27,12 @@ dependencies {
 }
 
 android {
-  compileSdkVersion 22
-  buildToolsVersion "23.0.0"
+  compileSdkVersion 21
+  buildToolsVersion "21.1.2"
 
   defaultConfig {
     applicationId 'android10.org.viewgroupperformance'
-    targetSdkVersion 22
+    targetSdkVersion 21
   }
 
   lintOptions {
