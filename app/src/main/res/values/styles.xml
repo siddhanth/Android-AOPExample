@@ -7,11 +7,6 @@
         <item name="windowActionBar">false</item>
     </style>
 
-    <style name="StyleTextInputLayout" parent="@android:style/TextAppearance">
-        <item name="android:textColor">@color/primaryColor</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
     <style name="CardViewStyle" parent="CardView">
         <item name="cardCornerRadius">0dp</item>
         <item name="cardElevation">1dp</item>
