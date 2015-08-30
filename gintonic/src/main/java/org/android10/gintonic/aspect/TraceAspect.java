@@ -141,7 +141,9 @@ public class TraceAspect {
                                                                  viewId + "");
                 if (eventName != null) {
                     Log.d(Constants.TAG, "function present in the store");
-                    track.log(eventName, className, methodName);
+                    if (!DEBUG) {
+                        track.log(eventName, className, methodName);
+                    }
                 } else {
                     Log.d(Constants.TAG, "function not present");
                 }
