@@ -61,42 +61,42 @@ public class FeedActivity extends ActionBarActivity {
         model.setName("Siddhanth Jain");
         model.setTime("30 mins");
         model.setData("This is the data part for the news feed 1 for the logged in user");
-        model.setImage("Image 1");
+        model.setImage(R.drawable.pimage1);
         data.add(model);
 
         model = new FeedModel();
         model.setName("Ashish Singhal");
         model.setTime("45 mins");
         model.setData("This is the data part for the news feed 2 for the logged in user");
-        model.setImage("Image 1");
+        model.setImage(R.drawable.pimage2);
         data.add(model);
 
         model = new FeedModel();
         model.setName("Mohit");
         model.setTime("2hrs");
         model.setData("This is the data part for the news feed 3 for the logged in user");
-        model.setImage("Image 1");
+        model.setImage(R.drawable.pimage3);
         data.add(model);
 
         model = new FeedModel();
         model.setName("Govind");
         model.setTime("9 hrs");
         model.setData("This is the data part for the news feed 4 for the logged in user");
-        model.setImage("Image 1");
+        model.setImage(R.drawable.pimage4);
         data.add(model);
 
         model = new FeedModel();
         model.setName("Harman Singh");
         model.setTime("1 day");
         model.setData("This is the data part for the news feed 5 for the logged in user");
-        model.setImage("Image 1");
+        model.setImage(R.drawable.pimage5);
         data.add(model);
 
         model = new FeedModel();
         model.setName("Aditya Prabhu");
         model.setTime("2 days");
         model.setData("This is the data part for the news feed 6 for the logged in user");
-        model.setImage("Image 1");
+        model.setImage(R.drawable.pimage6);
         data.add(model);
     }
 

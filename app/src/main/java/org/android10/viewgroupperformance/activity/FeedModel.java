@@ -8,7 +8,7 @@ public class FeedModel {
     String name;
     String time;
     String data;
-    String image;
+    int image;
 
     public String getName() {
         return name;
@@ -26,7 +26,7 @@ public class FeedModel {
         this.data = data;
     }
 
-    public void setImage(String image) {
+    public void setImage(int image) {
         this.image = image;
     }
 
@@ -38,7 +38,7 @@ public class FeedModel {
         return data;
     }
 
-    public String getImage() {
+    public int getImage() {
         return image;
     }
 }

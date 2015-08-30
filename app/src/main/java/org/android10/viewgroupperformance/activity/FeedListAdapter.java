@@ -1,6 +1,7 @@
 package org.android10.viewgroupperformance.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,17 @@ import org.android10.viewgroupperformance.R;
 
 import java.util.List;
 
-public class FeedListAdapter extends BaseAdapter implements View.OnClickListener{
+public class FeedListAdapter extends BaseAdapter implements View.OnClickListener {
 
     List<FeedModel> data;
     Context context;
     private LayoutInflater inf;
     boolean likeSelected, commentSelected, shareSelected;
+
+    public static String NAME = "name";
+    public static String IMAGE = "image";
+    public static String DATA = "data";
+    public static String TIME = "time";
 
     public FeedListAdapter(List<FeedModel> data, Context context) {
         this.data = data;
@@ -51,6 +57,7 @@ public class FeedListAdapter extends BaseAdapter implements View.OnClickListener
         }
 
         FrameLayout feedCard = (FrameLayout) convertView.findViewById(R.id.feed_card);
+        feedCard.setTag(position);
         feedCard.setOnClickListener(this);
 
         TextView name = (TextView) convertView.findViewById(R.id.feed_name);
@@ -60,14 +67,14 @@ public class FeedListAdapter extends BaseAdapter implements View.OnClickListener
         time.setText(data.get(position).getTime());
 
         CircleImageView image = (CircleImageView) convertView.findViewById(R.id.feed_image);
-        image.setImageResource(R.drawable.default_profile);
+        image.setImageResource(data.get(position).getImage());
 
-        if(position == 1 || position == 4){
+        if (position == 1 || position == 4) {
             TextView feedData = (TextView) convertView.findViewById(R.id.feed_data);
             feedData.setVisibility(View.GONE);
             ImageView feedDataImage = (ImageView) convertView.findViewById(R.id.feed_data_image);
             feedDataImage.setVisibility(View.VISIBLE);
-        } else{
+        } else {
             TextView feedData = (TextView) convertView.findViewById(R.id.feed_data);
             feedData.setVisibility(View.VISIBLE);
             feedData.setText(data.get(position).getData());
@@ -89,37 +96,55 @@ public class FeedListAdapter extends BaseAdapter implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.feed_card:
+                int pos = (int) v.getTag();
+                Intent i = new Intent(context, ProfileActivity.class);
+                i.putExtra(NAME, data.get(pos).getName());
+                i.putExtra(DATA, data.get(pos).getData());
+                i.putExtra(TIME, data.get(pos).getTime());
+                i.putExtra(IMAGE, data.get(pos).getImage());
+                context.startActivity(i);
+
                 break;
             case R.id.feed_like:
-                TextView likeText = (TextView) v.findViewById(R.id.feed_like_text);
-                ImageView likeImage = (ImageView) v.findViewById(R.id.feed_like_img);
-                if(likeSelected){
+                LinearLayout likeL = (LinearLayout) v.findViewById(R.id.feed_like);
+                TextView likeText = (TextView) likeL.findViewById(R.id.feed_like_text);
+                ImageView likeImage = (ImageView) likeL.findViewById(R.id.feed_like_img);
+                if (likeSelected) {
+                    likeSelected = false;
                     likeImage.setImageResource(R.drawable.ic_action_thumb_up);
                     likeText.setTextColor(context.getResources().getColor(R.color.medium_grey));
-                } else{
+                } else {
+                    likeSelected = true;
                     likeImage.setImageResource(R.drawable.ic_action_thumb_up_blue);
                     likeText.setTextColor(context.getResources().getColor(R.color.primaryLight));
                 }
+                break;
             case R.id.feed_comment:
-                TextView commentText = (TextView) v.findViewById(R.id.feed_comment_text);
-                ImageView commentImage = (ImageView) v.findViewById(R.id.feed_comment_image);
-                if(likeSelected){
+                LinearLayout commentL = (LinearLayout) v.findViewById(R.id.feed_comment);
+                TextView commentText = (TextView) commentL.findViewById(R.id.feed_comment_text);
+                ImageView commentImage = (ImageView) commentL.findViewById(R.id.feed_comment_image);
+                if (commentSelected) {
+                    commentSelected = false;
                     commentImage.setImageResource(R.drawable.ic_communication_messenger);
                     commentText.setTextColor(context.getResources().getColor(R.color.medium_grey));
-                } else{
+                } else {
+                    commentSelected = true;
                     commentImage.setImageResource(R.drawable.ic_communication_messenger_blue);
                     commentText.setTextColor(context.getResources().getColor(R.color.primaryLight));
                 }
                 break;
             case R.id.feed_share:
-                TextView shareText = (TextView) v.findViewById(R.id.feed_share_text);
-                ImageView shareImage = (ImageView) v.findViewById(R.id.feed_share_image);
-                if(likeSelected){
+                LinearLayout shareL = (LinearLayout) v.findViewById(R.id.feed_share);
+                TextView shareText = (TextView) shareL.findViewById(R.id.feed_share_text);
+                ImageView shareImage = (ImageView) shareL.findViewById(R.id.feed_share_image);
+                if (shareSelected) {
+                    shareSelected = false;
                     shareImage.setImageResource(R.drawable.ic_social_share);
                     shareText.setTextColor(context.getResources().getColor(R.color.medium_grey));
-                } else{
+                } else {
+                    shareSelected = true;
                     shareImage.setImageResource(R.drawable.ic_social_share_blue);
                     shareText.setTextColor(context.getResources().getColor(R.color.primaryLight));
                 }
