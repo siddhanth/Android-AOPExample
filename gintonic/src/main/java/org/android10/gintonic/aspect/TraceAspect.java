@@ -116,6 +116,11 @@ public class TraceAspect {
             }
         }
 
+        if(!DEBUG){
+            processNormal = true;
+        }
+
+
         Log.d(Constants.TAG, "processNormal = " + processNormal);
         if (!processNormal) {
             lastClassName = className;
