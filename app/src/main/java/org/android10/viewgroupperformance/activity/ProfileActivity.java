@@ -33,7 +33,6 @@ public class ProfileActivity extends ActionBarActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         }
-
         TextView nameView = (TextView) findViewById(R.id.profile_name);
         nameView.setText(name);
 
