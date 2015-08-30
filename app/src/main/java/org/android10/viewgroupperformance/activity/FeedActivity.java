@@ -2,7 +2,7 @@ package org.android10.viewgroupperformance.activity;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.ListView;
 
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Created by hsingh on 8/30/2015.
  */
-public class FeedActivity extends AppCompatActivity {
+public class FeedActivity extends ActionBarActivity {
 
     private Toolbar toolbar;
     List<FeedModel> data = new ArrayList<FeedModel>();
