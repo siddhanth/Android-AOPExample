@@ -2,8 +2,9 @@ package org.android10.viewgroupperformance.activity;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import org.android10.gintonic.aspect.TraceAspect;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Created by hsingh on 8/30/2015.
  */
-public class FeedActivity extends AppCompatActivity {
+public class FeedActivity extends ActionBarActivity {
 
     private Toolbar toolbar;
     List<FeedModel> data = new ArrayList<FeedModel>();
@@ -33,6 +34,9 @@ public class FeedActivity extends AppCompatActivity {
             toolbar.setTitle("News Feed");
             toolbar.setTitleTextColor(getResources().getColor(R.color.white));
             setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         }
 
         ListView feedList = (ListView) findViewById(R.id.feed_list);
@@ -40,6 +44,16 @@ public class FeedActivity extends AppCompatActivity {
         FeedListAdapter adapter = new FeedListAdapter(data, mContext);
         feedList.setAdapter(adapter);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void getData(){

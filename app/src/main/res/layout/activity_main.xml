@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primaryColor"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -22,6 +22,7 @@
             android:layout_marginRight="30dp"
             android:background="@drawable/edittext_selector"
             android:cursorVisible="true"
+            android:gravity="center"
             android:hint="User name"
             android:padding="5dp"
             android:textColor="@color/primaryColor"
@@ -37,7 +38,9 @@
             android:layout_marginTop="30dp"
             android:background="@drawable/edittext_selector"
             android:cursorVisible="true"
+            android:gravity="center"
             android:hint="Password"
+            android:inputType="textPassword"
             android:padding="5dp"
             android:textColor="@color/primaryColor"
             android:textCursorDrawable="@null" />
@@ -49,7 +52,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="30dp"
-            android:background="@color/white"
+            android:background="@color/primaryColor"
             android:elevation="5dp"
             android:text="Login" />
 
