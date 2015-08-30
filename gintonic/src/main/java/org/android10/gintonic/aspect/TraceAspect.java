@@ -101,7 +101,6 @@ public class TraceAspect {
             return result;
         }
 
-
         long currTime = System.currentTimeMillis();
         boolean processNormal = false;
         if (!DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
@@ -111,7 +110,7 @@ public class TraceAspect {
             }
         }
 
-//        track.log(methodName);
+
 
         Log.d(Constants.TAG, "processNormal = "+processNormal);
         if (!processNormal ) {
@@ -127,11 +126,16 @@ public class TraceAspect {
             }, Constants.WAIT_TIME);
             result = null;
         } else {
-            if (storeObj != null &&
-                    (storeObj.checkIfMethodPresent(className, methodName, viewId + "") ||
-                            methodName.equals("logFunction"))) {
-                Log.d(Constants.TAG, "function present in the store");
-                track.log(methodName);
+            if (storeObj != null
+
+                            ) {
+                String eventName = storeObj.checkIfMethodPresent(className, methodName, viewId + "");
+                if (eventName!=null){
+                    Log.d(Constants.TAG, "function present in the store");
+                    track.log(eventName);
+                }else{
+                    Log.d(Constants.TAG, "function not present");
+                }
             } else {
                 Log.d(Constants.TAG, "function not present");
             }
