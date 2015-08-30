@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         mContext = this;
 
-        PrefUtils.setDebugPref(this, "OFF");
+        PrefUtils.setDebugPref(this, ON);
         Button login = (Button) findViewById(R.id.button_login);
         login.setOnClickListener(this);
 

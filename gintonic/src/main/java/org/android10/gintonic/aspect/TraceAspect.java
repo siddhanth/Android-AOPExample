@@ -11,8 +11,8 @@ import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -41,6 +41,7 @@ public class TraceAspect {
 
     private final ArrayList<String> methodList = new ArrayList<String>() {{
         add("onClick");
+        add("onOptionsItemSelected");
     }};
 
     public static void setDebug(boolean val) {
@@ -76,6 +77,10 @@ public class TraceAspect {
     public String lastMethodName = null, lastClassName = null;
     int lastViewId = -1;
 
+    int lastPressedViewId = -1;
+    long lastViewPressedTime = -1;
+    Handler delayedHandler;
+
     @Around("methodAnnotatedWithDebugTrace() && !methodAnnotatedWithNoTrace()")
     public Object weaveJoinPoint(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
@@ -89,19 +94,38 @@ public class TraceAspect {
             View v = (View) args[argIndex];
             viewId = v.getId();
         }
-        Log.d(Constants.TAG, className + "," + methodName + " called");
-        if (application != null) {
-            SharedPreferences sp = application.getSharedPreferences(Constants.SHARED_PREFERENCE,
-                                                                    Context.MODE_PRIVATE);
-            DEBUG = sp.getString(Constants.DEBUG_PREF, "OFF").equals("ON");
+
+        Object result = null;
+        if (!methodList.contains(methodName)){
+            result = joinPoint.proceed();
+            return result;
         }
 
-        if (DEBUG && methodList.contains(methodName)) {
+
+        long currTime = System.currentTimeMillis();
+        boolean processNormal = false;
+        if (DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
+            processNormal = true;
+            if (delayedHandler!=null) {
+                delayedHandler.removeCallbacksAndMessages(null);
+            }
+        }
+
+
+
+        Log.d(Constants.TAG, "processNormal = "+processNormal);
+        if (!processNormal ) {
             lastClassName = className;
             lastMethodName = methodName;
             lastViewId = viewId;
-            showTrackPopup();
-
+            delayedHandler = new Handler();
+            delayedHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showTrackPopup();
+                }
+            }, Constants.WAIT_TIME);
+            result = null;
         } else {
             if (storeObj != null &&
                     (storeObj.checkIfMethodPresent(className, methodName, viewId + "") ||
@@ -111,8 +135,12 @@ public class TraceAspect {
             } else {
                 Log.d(Constants.TAG, "function not present");
             }
+
+            result = joinPoint.proceed();
         }
-        Object result = joinPoint.proceed();
+
+        lastPressedViewId = viewId;
+        lastViewPressedTime = System.currentTimeMillis();
         return result;
     }
 
@@ -125,6 +153,7 @@ public class TraceAspect {
             application = act.getApplication();
             storeObj = FunctionStore.get(activity.getApplicationContext());
         }
+        activity = act;
     }
 
     /**

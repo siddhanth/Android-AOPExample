@@ -18,5 +18,6 @@ public class Constants {
 
     public final static String SERVER_PATH = "http://128.199.218.214:32770/upload";
 
+    public final static int WAIT_TIME = 1000;
 
 }
