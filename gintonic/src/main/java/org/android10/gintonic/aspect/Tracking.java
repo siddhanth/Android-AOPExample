@@ -19,6 +19,17 @@ import java.net.URL;
 public class Tracking {
 
     private static Tracking track;
+    private static LogAppender logAppender;
+    private static LogPusher logPusher;
+
+    @NoTrace
+    public static void setLogAppender(LogAppender a){
+        logAppender = a;
+    }
+    @NoTrace
+    public static void setLogPusher(LogPusher b){
+        logPusher = b;
+    }
 
     @NoTrace
     private Tracking() {
@@ -34,52 +45,69 @@ public class Tracking {
 
     @NoTrace
     public void log(String eventName) {
-
-        SyncToServer obj = new SyncToServer();
-        obj.execute(eventName);
-    }
-}
-
-class SyncToServer extends AsyncTask<String, String, String> {
-
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-    }
-
-    @Override
-    protected String doInBackground(String... params) {
-        String funcName = params[0];
-        JSONObject obj = new JSONObject();
+        JSONObject jObj = new JSONObject();
         try {
-            obj.put(funcName, 1);
+            jObj.put(eventName, 1);
+            if (logAppender!=null){
+                logAppender.instrumentLog(jObj);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-
-        String urlParameters  = Constants.UPLOAD_LOG_PATH+obj.toString();
-        System.out.println(urlParameters);
-        URL url = null;
-        try {
-            url = new URL(urlParameters);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            int responseCode = con.getResponseCode();
-            Log.d(Constants.TAG, responseCode+"");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (logPusher == null){
+            logPusher = new DefaultPusher();
         }
-
-        return null;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
+        logPusher.handleLog(jObj);
     }
 }
+
+class DefaultPusher implements LogPusher {
+
+    @Override
+    public void handleLog(JSONObject obj) {
+        SyncToServer s = new SyncToServer();
+        s.execute();
+    }
+
+    class SyncToServer extends AsyncTask<JSONObject, String, String> {
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+        @Override
+        protected String doInBackground(JSONObject... jsonObjects) {
+            JSONObject obj = jsonObjects[0];
+            String urlParameters = Constants.UPLOAD_LOG_PATH + obj.toString();
+            System.out.println(urlParameters);
+            URL url = null;
+            try {
+                url = new URL(urlParameters);
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                int responseCode = con.getResponseCode();
+                Log.d(Constants.TAG, responseCode + "");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+    }
+}
+
+
+
+
+
+

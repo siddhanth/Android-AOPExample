@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +26,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +97,7 @@ public class TraceAspect {
         int viewId = -1;
         Object[] args = joinPoint.getArgs();
 
-        if (sp!=null) {
+        if (sp != null) {
             DEBUG = sp.getString(Constants.DEBUG_PREF, Constants.OFF).equals(Constants.ON);
         }
         for (int argIndex = 0; argIndex < args.length; argIndex++) {
@@ -102,7 +108,7 @@ public class TraceAspect {
         }
 
         Object result = null;
-        if (!methodList.contains(methodName)){
+        if (!methodList.contains(methodName)) {
             result = joinPoint.proceed();
             return result;
         }
@@ -111,15 +117,14 @@ public class TraceAspect {
         boolean processNormal = false;
         if (DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
             processNormal = true;
-            if (delayedHandler!=null) {
+            if (delayedHandler != null) {
                 delayedHandler.removeCallbacksAndMessages(null);
             }
         }
 
 
-
-        Log.d(Constants.TAG, "processNormal = "+processNormal);
-        if (!processNormal ) {
+        Log.d(Constants.TAG, "processNormal = " + processNormal);
+        if (!processNormal) {
             lastClassName = className;
             lastMethodName = methodName;
             lastViewId = viewId;
@@ -134,12 +139,13 @@ public class TraceAspect {
         } else {
             if (storeObj != null
 
-                            ) {
-                String eventName = storeObj.checkIfMethodPresent(className, methodName, viewId + "");
-                if (eventName!=null){
+                    ) {
+                String eventName = storeObj.checkIfMethodPresent(className, methodName,
+                                                                 viewId + "");
+                if (eventName != null) {
                     Log.d(Constants.TAG, "function present in the store");
                     track.log(eventName);
-                }else{
+                } else {
                     Log.d(Constants.TAG, "function not present");
                 }
             } else {
@@ -157,36 +163,21 @@ public class TraceAspect {
     private static Application application;
     private static Activity activity;
 
+    public static void initLogHandlers(LogAppender a, LogPusher b) {
+        Tracking.setLogAppender(a);
+        Tracking.setLogPusher(b);
+    }
+
     public static void init(Activity act) {
         if (application == null) {
             activity = act;
             application = act.getApplication();
             storeObj = FunctionStore.get(activity.getApplicationContext());
         }
-        if (sp == null ){
+        if (sp == null) {
             sp = activity.getSharedPreferences(Constants.SHARED_PREFERENCE, Context.MODE_PRIVATE);
         }
         activity = act;
-    }
-
-    /**
-     * Create a log message.
-     *
-     * @param methodName     A string with the method name.
-     * @param methodDuration Duration of the method in milliseconds.
-     * @return A string representing message.
-     */
-    private static String buildLogMessage(String methodName, long methodDuration) {
-        StringBuilder message = new StringBuilder();
-        message.append("Gintonic --> ");
-        message.append(methodName);
-        message.append(" --> ");
-        message.append("[");
-        message.append(methodDuration);
-        message.append("ms");
-        message.append("]");
-
-        return message.toString();
     }
 
     static boolean popupShown = false;
@@ -237,3 +228,4 @@ public class TraceAspect {
         popupShown = true;
     }
 }
+
