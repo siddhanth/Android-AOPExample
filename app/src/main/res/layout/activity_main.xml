@@ -54,6 +54,7 @@
             android:layout_marginTop="30dp"
             android:background="@color/primaryColor"
             android:elevation="5dp"
+            android:textColor="@color/white"
             android:text="Login" />
 
     </LinearLayout>
