@@ -104,14 +104,14 @@ public class TraceAspect {
 
         long currTime = System.currentTimeMillis();
         boolean processNormal = false;
-        if (DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
+        if (!DEBUG && lastViewId == viewId && currTime - lastViewPressedTime < Constants.WAIT_TIME) {
             processNormal = true;
             if (delayedHandler!=null) {
                 delayedHandler.removeCallbacksAndMessages(null);
             }
         }
 
-
+//        track.log(methodName);
 
         Log.d(Constants.TAG, "processNormal = "+processNormal);
         if (!processNormal ) {
